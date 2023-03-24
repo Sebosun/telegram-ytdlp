@@ -45,7 +45,7 @@ async def my_handler(_, message):
     possibleLink = textSplit[1].strip(' ')
     filename = downloadVideo(possibleLink)
     if(not filename):
-        await message.reply_text("Zjebałeś coś")
+        await message.reply_text("Coś nie wyszło")
         return
 
     print('Sending video...')

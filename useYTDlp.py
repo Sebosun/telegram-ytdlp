@@ -1,4 +1,5 @@
 from __future__ import unicode_literals
+from typing import Tuple
 import yt_dlp as youtube_dl
 import os
 
@@ -10,15 +11,15 @@ ydl_opts = {
     'playlistend': 1,
 }
 
-def downloadVideo(url: str):
+def download_video(url: str) -> Tuple[str, None] | Tuple[None, Exception]:
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         try:
             filename = ydl.prepare_filename(ydl.extract_info(url))
-            return filename
-        except:
-            return False
+            return filename, None
+        except Exception as e:
+            return None, e
 
-def deleteCreatedVideo(path:str):
+def delete_created_video(path:str):
     if os.path.exists(path):
         os.remove(path)
         return True

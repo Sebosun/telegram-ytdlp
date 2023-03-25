@@ -1,6 +1,6 @@
 from pyrogram import client, filters
 from helpers import verifyCommand
-from useYTDlp import deleteCreatedVideo, downloadVideo
+from useYTDlp import delete_created_video, download_video
 from dotenv import load_dotenv
 import os
 
@@ -31,36 +31,40 @@ async def my_handler(_, message):
     text = message.text
     command = verifyCommand(text)
 
-
     if(not command):
         return 
 
     print('init attempt to download ', message.text)
 
-    textSplit = text.split(command)
+    text_split = text.split(command).strip(' ')
 
-    if(len(textSplit) <= 1):
+    """ if theres nothing after /ytdlp """
+    if(len(text_split) <= 1):
         return
 
-    possibleLink = textSplit[1].strip(' ')
-    filename = downloadVideo(possibleLink)
-    if(not filename):
-        await message.reply_text("Coś nie wyszło")
+    possible_link = text_split[1].strip(' ')
+    video_filename, exception = download_video(possible_link)
+    if(isinstance(exception, Exception)):
+        print(exception)
+        await message.reply_text(f'Error downloading video {exception}')
+        return
+
+    if(not isinstance(video_filename, str)):
         return
 
     print('Sending video...')
 
-    response = await message.reply_video(filename, quote=True)
+    response = await message.reply_video(video_filename, quote=True)
     if(response):
         print('Video sent')
     else:
         print('Error sending video')
 
-    isDeleted = deleteCreatedVideo(filename)
+    is_deleted = delete_created_video(video_filename)
 
-    if(isDeleted):
-        print('Video deleted from ', filename)
+    if is_deleted:
+        print('Video deleted from ', video_filename)
     else:
-        print('Video couldnt be deleted from ', filename)
+        print('Video couldnt be deleted from ', video_filename)
 
 app.run()
